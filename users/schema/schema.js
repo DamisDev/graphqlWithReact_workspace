@@ -36,7 +36,16 @@ const RootQuery = new GraphQLObjectType({
             args: { id: { type: GraphQLString } },
             resolve(parentValue, args) {
                 return axios.get(`http://localhost:3000/users/${args.id}`)
-                    .then(resp => resp.data)
+                    .then(resp => {
+                        if (resp?.data) {
+                            return resp.data;
+                        } else {
+                            throw new Error("Utente non trovato");
+                        }
+                    })
+                    .catch(error => {
+                        throw new Error(error.message);
+                    });
             },
         },
     },
