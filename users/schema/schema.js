@@ -1,7 +1,7 @@
 /////// REMEMBER: the schema is what tell GraphQL exactly what our data looks like /////
 
 const { graphql } = require('graphql');
-const _ = require('lodash'); // It just helps us walk through collections of data and work through collections of data.
+const axios = require('axios');
 
 const {
     GraphQLObjectType,
@@ -9,12 +9,7 @@ const {
     GraphQLInt,
     GraphQLSchema
 } = require('graphql');
-
-// list fo users
-const users = [
-    { id: "23", firstName: "Bill", age: 20 },
-    { id: "47", firstName: "Samantha", age: 21 },
-];
+const {response} = require("express");
 
 const UserType = new GraphQLObjectType({
     name: "User",
@@ -40,13 +35,14 @@ const RootQuery = new GraphQLObjectType({
             type: UserType,
             args: { id: { type: GraphQLString } },
             resolve(parentValue, args) {
-                return _.find(users, { id: args.id});
+                return axios.get(`http://localhost:3000/users/${args.id}`)
+                    .then(resp => resp.data)
             },
         },
     },
 });
 
-// export the schema thata  I just created
+// export the schema that I've just created
 module.exports = new GraphQLSchema({
     query: RootQuery,
 });
